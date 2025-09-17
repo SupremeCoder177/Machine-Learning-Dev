@@ -20,4 +20,4 @@ try:
 	print(np.sum([n1, n2, n3])) 
 	print(np.sum([n1, n3], axis = 0))
 except Exception as e:
-	print("an error has occured")
+	print("an error has occurred")

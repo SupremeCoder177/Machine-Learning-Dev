@@ -5,7 +5,7 @@ import numpy as np
 n1 = np.array([10, 20, 30])
 n2 = np.array([40, 50, 60])
 
-# stacks n1 on top of n2, that is create a 2 dimensional array and puts n1 at row 1
+# stacks n1 on top of n2, that is create a 2-dimensional array and puts n1 at row 1
 print(np.vstack((n1, n2)))
 
 # stacks the arrays on the same row

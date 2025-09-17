@@ -11,5 +11,5 @@ print(np.intersect1d(n1, n2))
 # prints the unique elements to n1
 print(np.setdiff1d(n1, n2))
 
-# prints the uniqye elments to n2
+# prints the unique elements to n2
 print(np.setdiff1d(n2, n1))

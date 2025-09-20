@@ -10,10 +10,22 @@ class InvalidDelimeter(Exception):
     def __init__(self, msg): pass
 
 
+def get_line(file_path : str, start_index : int, return_last_index : bool) -> str:
+    output = str()
+    index = start_index
+    with open(file_path, "r") as f:
+        temp = f.read()
+        while temp[index] != '\n':
+            output += temp[index]
+            index += 1
+    return output if not return_last_index else output, index + 1
+
+
 class CsvReader:
 
     def __init__(self):
         self.delimeters = [",", ".", ":", " ", "_", "-"]
+        self.index = 0
 
     def read(self, file_path : str, delimeter = ",") -> CsvFile:
         if not os.path.exists(file_path):
@@ -29,41 +41,44 @@ class CsvReader:
             raise InvalidDelimeter("The delimeter passed is not valid")
 
         tmp = CsvFile()
-        with open(file_path, "r") as f:
-            self.parse(f.read(), tmp, delimeter)
+        max_len = 0
+        with open(file_path, 'r') as f:
+            max_len = len(f.read())
+
+        self.index = 0
+        self.parse(file_path, tmp, delimeter, max_len)
         return tmp
 
-    def parse(self, data : str, tmp : CsvFile, delimeter : str) -> None:
-        index = 0
-        limit = len(data)
-        header = True
-        while index < limit:
-            print('parsing...')
-            row = self.get_row(index, data, delimeter)
-            if isinstance(row, list):
-                tmp.add(row[0], header)
-                index = row[1]
-            else:
-                index = row
-            if header: header = False
+    def parse(self, fp : str, tmp : CsvFile, delimeter : str, max_len : int) -> None:
+        headings_line, self.index = get_line(fp, self.index, True)
+        cells_line, self.index = get_line(fp, self.index, True)
+        headings = self.tokenize(headings_line, delimeter)
+        cells = self.tokenize(cells_line, delimeter)
 
-    def get_row(self, start_index: int, text: str, delimeter: str) -> List[any] | None:
-        output = []
-        index = start_index
-        while text[index] != "\n" or text[index] != "\0":
-            tmp =  self.get_next(text, start_index, delimeter)
-            if isinstance(tmp, list):
-                output.append(tmp[0])
-                index = tmp[1]
-            else:
-                index = tmp
-        return [output, index] if len(output) != 0 else index
+        temp = dict()
+        for heading, cell in zip(headings, cells):
+            temp[heading] = type(cell)
 
-    @staticmethod
-    def get_next(txt : str, index : int, delimeter : str) -> List[any] | int:
-        output = ""
-        while True:
-            if txt[index] == delimeter or txt[index] == '\n' or txt[index] == '\0': break
-            output += txt[index]
-            index += 1
-        return [output, index] if output != "" else index
+        tmp.add(temp, True)
+        tmp.add(cells, False)
+        while self.index < max_len:
+            line, self.index = get_line(fp, self.index, True)
+            tokens = self.tokenize(line, delimeter)
+            tmp.add(tokens, False)
+
+    def tokenize(self, text : str, delimeter : str) -> List[any]:
+        tokens = text.strip().split(delimeter)
+        for i in range(len(tokens)):
+            try:
+                temp = int(tokens[i])
+                tokens[i] = temp
+            except ValueError as e:
+                continue
+        return tokens
+
+
+
+
+# with open("..\\Datasets\\CSV Files\\test.csv", "r") as f:
+#     for ch in f.read():
+#         print(ch)

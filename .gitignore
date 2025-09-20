@@ -2,3 +2,5 @@
 Datasets/Books
 .venv
 Datasets/CSV Files
+*.xml
+.idea

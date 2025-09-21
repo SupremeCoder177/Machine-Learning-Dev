@@ -1,0 +1,4 @@
+OpenCV is an open-source library used for machine learning and working with images or videos.
+
+Basically if you want to make an AI that works with images or videos then OpenCV is the library you will
+use, it has many in-built algorithms for training models on data.
